@@ -1,16 +1,38 @@
-# React + Vite
+# Nombre del proyecto
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+OceanWatch
 
-Currently, two official plugins are available:
+# Cliente y problemática
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+OceanWatch está dirigido a equipos de investigación marina y conservación que necesitan un panel centralizado para catalogar especies, monitorear datos de biodiversidad y apoyar decisiones basadas en información científica local.
 
-## React Compiler
+La problemática es que los proyectos de conservación suelen trabajar con datos estáticos o desactualizados, lo que dificulta el seguimiento del estado de conservación y de las zonas de investigación prioritarias.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+# Descripción de la solución
 
-## Expanding the ESLint configuration
+OceanWatch es una SPA construida con React y Vite que ofrece un directorio de especies marinas con información de investigación local. En el futuro integrará APIs externas de biodiversidad para obtener datos actualizados sobre el estado de conservación, distribución y recomendaciones de estudio.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+# Funcionalidades propuestas
+
+- Directorio de especies marinas con datos básicos y de investigación.
+- Filtrado por nombre de especie.
+- Rendering modular de tarjetas de especie (`SpeciesCard`) dentro de un directorio (`SpeciesDirectory`).
+- Integración futura con API pública de biodiversidad para actualizaciones en tiempo real.
+- Información de profundidad recomendada y zona de investigación para buceo científico.
+
+# Estructura del proyecto
+
+- `src/`
+  - `components/` — componentes funcionales (`SpeciesCard`, `SpeciesDirectory`).
+  - `App.jsx` — componente principal con estado y lógica de filtrado.
+  - `main.jsx` — entry point de la aplicación.
+  - `assets/`, `styles/`, `services/` — organización propuesta para escalar.
+- `package.json` — dependencias del proyecto.
+- `README.md` — documentación del proyecto.
+
+# Evidencia del uso de IA
+
+
+# Explicación general del avance
+
+Se ha construido la base de la interfaz con React, incluyendo el manejo de estado principal y la organización de componentes para renderizar tarjetas de especies. Además, se ha diseñado la estructura necesaria para que OceanWatch pueda evolucionar hacia el consumo de datos externos y soporte de investigación científica marina.
