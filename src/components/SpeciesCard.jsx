@@ -9,6 +9,7 @@ function SpeciesCard({
   diet,
   imageUrl,
   onSave,
+  onRemove,
   isSaved,
 }) {
   let statusColor = '#5b6b72';
@@ -19,9 +20,10 @@ function SpeciesCard({
   }
 
   return (
-    <article className="species-card">
+    <article className={`species-card ${isSaved ? 'species-card--saved' : ''}`}>
       <img className="species-card__image" src={imageUrl} alt={name} />
       <h3>{name}</h3>
+      {isSaved && <div className="species-card__seen">✅ Especie vista</div>}
       <p>
         <strong>Nombre científico:</strong> {scientificName}
       </p>
@@ -45,7 +47,18 @@ function SpeciesCard({
           onClick={onSave}
           disabled={isSaved}
         >
-          {isSaved ? 'Guardada en mi bitácora' : 'Guardar en mi bitácora'}
+          <span className="button-icon" aria-hidden="true">💾</span>{' '}
+          {isSaved ? '✔️ Guardada en mi bitácora' : 'Guardar en mi bitácora'}
+        </button>
+      )}
+      {onRemove && (
+        <button
+          type="button"
+          className="species-card__remove-button"
+          onClick={onRemove}
+        >
+          <span className="button-icon" aria-hidden="true">❌</span>{' '}
+          Quitar de mi bitácora
         </button>
       )}
     </article>
@@ -61,6 +74,7 @@ SpeciesCard.propTypes = {
   diet: PropTypes.string,
   imageUrl: PropTypes.string.isRequired,
   onSave: PropTypes.func,
+  onRemove: PropTypes.func,
   isSaved: PropTypes.bool,
 };
 

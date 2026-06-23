@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import SpeciesCard from './SpeciesCard';
 
-function SpeciesDirectory({ species, onSave, savedSpecies = [], showSaveButton = true }) {
+function SpeciesDirectory({ species, onSave, savedSpecies = [], showSaveButton = true, onRemove }) {
   if (!species || species.length === 0) {
     return <p>No se encontraron especies marinas.</p>;
   }
@@ -23,6 +23,7 @@ function SpeciesDirectory({ species, onSave, savedSpecies = [], showSaveButton =
               diet={item.diet}
               imageUrl={item.imageUrl}
               onSave={showSaveButton ? () => onSave?.(item) : undefined}
+              onRemove={onRemove ? () => onRemove(item.id) : undefined}
               isSaved={isSaved}
             />
           );
@@ -46,6 +47,7 @@ SpeciesDirectory.propTypes = {
     })
   ).isRequired,
   onSave: PropTypes.func,
+  onRemove: PropTypes.func,
   savedSpecies: PropTypes.arrayOf(
     PropTypes.shape({ id: PropTypes.number.isRequired })
   ),

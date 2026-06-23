@@ -88,6 +88,7 @@ function App() {
   const [species] = useState(initialSpecies);
   const [filterName, setFilterName] = useState('');
   const [sortBy, setSortBy] = useState('name');
+  const [currentView, setCurrentView] = useState('catalog');
   const [savedSpecies, setSavedSpecies] = useState(() => {
     if (globalThis?.localStorage === undefined) {
       return [];
@@ -139,43 +140,71 @@ function App() {
     });
   };
 
+  const handleRemoveSpecies = (id) => {
+    setSavedSpecies((current) => current.filter((s) => s.id !== id));
+  };
+
   return (
     <div className="app-container">
       <h1>OceanWatch</h1>
-      <section>
-        <label htmlFor="species-filter">Filtrar por nombre:</label>
-        <input
-          id="species-filter"
-          type="text"
-          value={filterName}
-          onChange={(event) => setFilterName(event.target.value)}
-          placeholder="Ej. Tonina"
-        />
-      </section>
-      <section>
-        <label htmlFor="sort-by">Ordenar catálogo:</label>
-        <select
-          id="sort-by"
-          value={sortBy}
-          onChange={(event) => setSortBy(event.target.value)}
+      <nav className="top-nav">
+        <button
+          type="button"
+          className={currentView === 'catalog' ? 'active' : ''}
+          onClick={() => setCurrentView('catalog')}
         >
-          <option value="name">Ordenar por nombre (A-Z)</option>
-          <option value="depth">Ordenar por profundidad</option>
-        </select>
-      </section>
-      <SpeciesDirectory
-        species={sortedSpecies}
-        onSave={handleSaveSpecies}
-        savedSpecies={savedSpecies}
-      />
-      <section className="saved-species">
-        <h2>Especies guardadas</h2>
-        {savedSpecies.length === 0 ? (
-          <p>No has guardado especies aún.</p>
-        ) : (
-          <SpeciesDirectory species={savedSpecies} showSaveButton={false} />
-        )}
-      </section>
+          <span className="button-icon" aria-hidden="true">📘</span>{' '}
+          Catálogo
+        </button>
+        <button
+          type="button"
+          className={currentView === 'bitacora' ? 'active' : ''}
+          onClick={() => setCurrentView('bitacora')}
+        >
+          <span className="button-icon" aria-hidden="true">📝</span>{' '}
+          Mi Bitácora
+        </button>
+      </nav>
+
+      {currentView === 'catalog' ? (
+        <>
+          <section>
+            <label htmlFor="species-filter">Filtrar por nombre:</label>
+            <input
+              id="species-filter"
+              type="text"
+              value={filterName}
+              onChange={(event) => setFilterName(event.target.value)}
+              placeholder="Ej. Tonina"
+            />
+          </section>
+          <section>
+            <label htmlFor="sort-by">Ordenar catálogo:</label>
+            <select
+              id="sort-by"
+              value={sortBy}
+              onChange={(event) => setSortBy(event.target.value)}
+            >
+              <option value="name">Ordenar por nombre (A-Z)</option>
+              <option value="depth">Ordenar por profundidad</option>
+            </select>
+          </section>
+          <SpeciesDirectory
+            species={sortedSpecies}
+            onSave={handleSaveSpecies}
+            savedSpecies={savedSpecies}
+          />
+        </>
+      ) : (
+        <section className="saved-species">
+          <h2>Mi Bitácora</h2>
+          {savedSpecies.length === 0 ? (
+            <p>No has guardado especies aún.</p>
+          ) : (
+              <SpeciesDirectory species={savedSpecies} showSaveButton={false} onRemove={handleRemoveSpecies} savedSpecies={savedSpecies} />
+            )}
+        </section>
+      )}
     </div>
   );
 }
