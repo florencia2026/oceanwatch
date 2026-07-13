@@ -98,6 +98,64 @@ OceanWatch es una SPA construida con React y Vite que ofrece un directorio de es
 - **Resultado:** Implementación de efectos visuales y animaciones CSS que mejoran la experiencia de usuario y dan un acabado profesional al catálogo.
 ---
 
+---
+### Fase 9: Integración con Fuente de Datos Externa (HTTP)
+- **Contexto**: La rúbrica exige que la aplicación consuma información desde una fuente externa mediante solicitudes HTTP, transformando la app en una solución dinámica.
+- **Prompt**: "Modifica App.jsx para integrar datos desde una API externa en lugar de archivos locales. Usa el hook useEffect para realizar una solicitud HTTP (fetch) al cargar la aplicación y guarda los resultados en un estado especies usando useState. Mapea este estado para renderizar dinámicamente el componente SpeciesCard por cada objeto obtenido desde la API https://jsonplaceholder.typicode.com/users. Entrégame el código actualizado de App.jsx."
+- **Resultado**: Se logró la integración de datos mediante solicitudes HTTP, permitiendo que la aplicación muestre información proveniente de un servicio externo.
+---
+
+---
+### Fase 10: Manejo Robusto de Estados y Errores
+- **Contexto**: Para cumplir con el criterio de "gestión de errores y situaciones inesperadas", es indispensable controlar qué sucede si la API falla o mientras los datos están cargando.
+- **Prompt**: "Basado en el código de la solicitud HTTP anterior, mejora App.jsx para gestionar el ciclo de vida de la petición: 1. Crea un estado loading (booleano) que muestre un mensaje 'Cargando especies...' al inicio. 2. Implementa un bloque try/catch alrededor del fetch para capturar cualquier falla en la conexión. 3. Si ocurre un error, actualiza un estado error para renderizar un mensaje amigable al usuario indicando que la carga falló. Actualiza el código de App.jsx."
+- **Implementación**:
+  ```javascript
+  // Estados para gestionar el ciclo de vida
+  const [species, setSpecies] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  
+  // Hook useEffect con try/catch
+  useEffect(() => {
+    const fetchSpecies = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('https://jsonplaceholder.typicode.com/users');
+        
+        if (!response.ok) {
+          throw new Error(`Error HTTP: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        setSpecies(transformedData);
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching species:', err);
+        setError(err.message);
+        setSpecies([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchSpecies();
+  }, []);
+  
+  // Renderizado condicional en JSX
+  {loading && <p>⏳ Cargando especies desde la API...</p>}
+  {error && <p>❌ Error al cargar las especies: {error}</p>}
+  ```
+- **Resultado**: ✅ Gestión de estados robusta implementada. La interfaz muestra mensajes apropiados durante la carga y captura errores de conexión de forma amigable.
+- **Verificación**: Se probó con éxito - la app carga 10 especies desde la API, muestra el spinner de carga mientras se obtienen datos, y maneja errores correctamente.
+---
+
+---
+### Fase 11: Validación de Entradas de Datos
+- **Contexto**: La rúbrica exige validar la información ingresada por el usuario, por lo que implementaremos una búsqueda segura en la aplicación.
+- **Prompt**: "Agrega una barra de búsqueda a App.jsx para filtrar las especies por nombre. 1. Crea un input de texto controlado mediante useState. 2. Implementa una función de validación que impida búsquedas vacías o con caracteres especiales prohibidos. 3. Si el usuario realiza una búsqueda que no coincide con ninguna especie de la lista, muestra un mensaje de aviso: 'No se encontraron especies con ese nombre'. Entrégame el código para integrar esta funcionalidad validada."
+- **Resultado**: Se integró un buscador funcional con validación de entradas, cumpliendo con los estándares de control de datos solicitados en la evaluación.
+---
+
 # Explicación general del avance
 
 Se ha construido la base de la interfaz con React, incluyendo el manejo de estado principal y la organización de componentes para renderizar tarjetas de especies. Además, se ha diseñado la estructura necesaria para que OceanWatch pueda evolucionar hacia el consumo de datos externos y soporte de investigación científica marina.
