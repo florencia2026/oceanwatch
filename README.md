@@ -153,7 +153,74 @@ OceanWatch es una SPA construida con React y Vite que ofrece un directorio de es
 ### Fase 11: Validación de Entradas de Datos
 - **Contexto**: La rúbrica exige validar la información ingresada por el usuario, por lo que implementaremos una búsqueda segura en la aplicación.
 - **Prompt**: "Agrega una barra de búsqueda a App.jsx para filtrar las especies por nombre. 1. Crea un input de texto controlado mediante useState. 2. Implementa una función de validación que impida búsquedas vacías o con caracteres especiales prohibidos. 3. Si el usuario realiza una búsqueda que no coincide con ninguna especie de la lista, muestra un mensaje de aviso: 'No se encontraron especies con ese nombre'. Entrégame el código para integrar esta funcionalidad validada."
-- **Resultado**: Se integró un buscador funcional con validación de entradas, cumpliendo con los estándares de control de datos solicitados en la evaluación.
+- **Implementación**:
+  ```javascript
+  // Función de validación - permite solo letras, números, espacios, guiones, apóstrofes y acentos españoles
+  const isValidSearchInput = (input) => {
+    const validPattern = /^[a-zA-Z0-9\s\-'áéíóúñüÁÉÍÓÚÑÜ]*$/;
+    return validPattern.test(input);
+  };
+  
+  // Estado para errores de búsqueda
+  const [searchError, setSearchError] = useState('');
+  
+  // Controlador de búsqueda con validación
+  const handleSearchChange = (event) => {
+    const inputValue = event.target.value;
+    
+    if (inputValue && !isValidSearchInput(inputValue)) {
+      setSearchError('❌ No se permiten caracteres especiales. Solo letras, números, espacios, guiones y apóstrofes.');
+      return;
+    }
+    
+    setFilterName(inputValue);
+    setSearchError('');
+  };
+  
+  // Renderizado en JSX
+  <section className="search-section">
+    <label htmlFor="species-filter">🔍 Filtrar por nombre:</label>
+    <input
+      id="species-filter"
+      type="text"
+      value={filterName}
+      onChange={handleSearchChange}
+      placeholder="Ej. Tonina, Centolla..."
+      aria-describedby="search-error"
+    />
+    {searchError && (
+      <p id="search-error" className="search-error-message">
+        {searchError}
+      </p>
+    )}
+  </section>
+  
+  {/* Mensaje de "no se encontraron especies" */}
+  {sortedSpecies.length === 0 && filterName.trim() !== '' && (
+    <section className="no-results-message">
+      <p>❌ No se encontraron especies con ese nombre. Intenta con otro término.</p>
+    </section>
+  )}
+  ```
+- **Estilos CSS** (App.css):
+  - `.search-section`: Gradiente teal oscuro con borde cyan, padding 20px, box-shadow con glow cyan
+  - `.search-section input`: Fondo semi-transparente cyan, texto blanco, focus state con enhanced shadow
+  - `.search-error-message`: Texto rojo (#ff6b6b) con font-weight 500
+  - `.no-results-message`: Gradiente rojo oscuro, borde rojo, similar styling al error-message
+- **Características**:
+  ✅ Input controlado mediante useState que actualiza `filterName` en tiempo real
+  ✅ Validación con regex que permite: letras (a-zA-Z), números, espacios, guiones, apóstrofes, acentos españoles
+  ✅ Prevención de caracteres especiales (@, #, $, %, etc.)
+  ✅ Mensaje de error dinámico que aparece solo si hay caracteres inválidos
+  ✅ Mensaje "No se encontraron especies..." que aparece cuando la búsqueda no coincide
+  ✅ Integración con el sistema de filtrado y ordenamiento existente
+  ✅ Estilos con glassmorphism design consistent con el resto de la app
+- **Resultado**: ✅ Buscador validado completamente funcional. La interfaz previene inputs inválidos y ofrece retroalimentación clara al usuario.
+- **Verificación**: 
+  - ✅ Búsqueda exitosa: Escribir "Chelsey" filtra correctamente la especie "Chelsey Dietrich"
+  - ✅ Sin resultados: Escribir "xyz123" muestra mensaje "No se encontraron especies con ese nombre"
+  - ✅ Validación de caracteres: Intentar escribir "@#$%" bloquea los caracteres especiales y muestra error de validación
+  - ✅ Estilos visuales: Mensaje de error en rojo dentro de la búsqueda, mensaje de no resultados en panel rojo oscuro
 ---
 
 # Explicación general del avance

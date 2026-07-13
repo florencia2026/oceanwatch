@@ -12,6 +12,42 @@ const imageUrls = [
   'merluzaaustral.jpg',
   'congriodorado.jpg',
   'mejillonchileno.jpg',
+  'jurel.jpg',
+];
+
+// Nombres de especies marinas chilenas con nombres científicos (10 especies únicas)
+const speciesNames = [
+  { name: 'Tonina', scientificName: 'Tursiops truncatus' },
+  { name: 'Lobo marino de un pelo', scientificName: 'Otaria byronia' },
+  { name: 'Centolla', scientificName: 'Lithodes santolla' },
+  { name: 'Puyé', scientificName: 'Galaxias maculatus' },
+  { name: 'Erizo lápiz', scientificName: 'Tetrapygus niger' },
+  { name: 'Merluza austral', scientificName: 'Merluccius australis' },
+  { name: 'Congrio dorado', scientificName: 'Genypterus blacodes' },
+  { name: 'Mejillón chileno', scientificName: 'Mytilus chilensis' },
+  { name: 'Jurel', scientificName: 'Trachurus murphyi' },
+];
+
+// Especies adicionales cuyas fotos (nombradas igual que el animal) están en /public
+const additionalSpecies = [
+  {
+    name: 'Huiche',
+    scientificName: 'Xystreurys rasile',
+    depth: '10-100 m',
+    conservationStatus: 'Preocupación Menor',
+    habitat: 'Fondos arenosos de plataforma continental',
+    diet: 'Peces y crustáceos (carnívoro)',
+    imageUrl: 'huiche.jpg',
+  },
+  {
+    name: 'Picoroco',
+    scientificName: 'Megabalanus psittacus',
+    depth: 'Intermareal - submareal',
+    conservationStatus: 'Preocupación Menor',
+    habitat: 'Costas rocosas expuestas',
+    diet: 'Filtrador (plancton)',
+    imageUrl: 'picoroco.jpg',
+  },
 ];
 
 // Datos de referencia para enriquecer los datos de la API
@@ -26,11 +62,24 @@ const speciesMetadata = [
   { depth: 'Intermareal - submareal somero', conservationStatus: 'Preocupación Menor', habitat: 'Costas rocosas y lechos de mejillones', diet: 'Filtrador (plancton)' },
 ];
 
+// Función de validación para la búsqueda
+const isValidSearchInput = (input) => {
+  // Permitir cadena vacía para poder limpiar el filtro
+  if (input === '') {
+    return true;
+  }
+  // Rechazar búsquedas vacías (solo espacios) o con caracteres especiales prohibidos.
+  // Permitir solo letras, números, espacios, guiones y apóstrofes.
+  const validPattern = /^[a-zA-Z0-9\s\-'áéíóúñüÁÉÍÓÚÑÜ]+$/;
+  return validPattern.test(input);
+};
+
 function App() {
   const [species, setSpecies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filterName, setFilterName] = useState('');
+  const [searchError, setSearchError] = useState('');
   const [sortBy, setSortBy] = useState('name');
   const [currentView, setCurrentView] = useState('catalog');
   const [savedSpecies, setSavedSpecies] = useState(() => {
@@ -58,19 +107,30 @@ function App() {
         
         const data = await response.json();
         
-        // Transformar datos de la API al formato de especies
-        const transformedSpecies = data.map((user, index) => ({
-          id: user.id,
-          name: user.name || `Especie ${index + 1}`,
-          scientificName: user.username || 'Desconocida',
-          depth: speciesMetadata[index % speciesMetadata.length].depth,
-          conservationStatus: speciesMetadata[index % speciesMetadata.length].conservationStatus,
-          habitat: user.company?.name || speciesMetadata[index % speciesMetadata.length].habitat,
-          diet: speciesMetadata[index % speciesMetadata.length].diet,
-          imageUrl: imageUrls[index % imageUrls.length],
-        }));
+        // Transformar datos de la API al formato de especies con nombres chilenos
+        // (limitamos a la cantidad de especies únicas para evitar repeticiones)
+        const transformedSpecies = data
+          .slice(0, speciesNames.length)
+          .map((user, index) => {
+          const speciesInfo = speciesNames[index];
+          return {
+            id: user.id,
+            name: speciesInfo.name,
+            scientificName: speciesInfo.scientificName,
+            depth: speciesMetadata[index % speciesMetadata.length].depth,
+            conservationStatus: speciesMetadata[index % speciesMetadata.length].conservationStatus,
+            habitat: speciesMetadata[index % speciesMetadata.length].habitat,
+            diet: speciesMetadata[index % speciesMetadata.length].diet,
+            imageUrl: imageUrls[index % imageUrls.length],
+          };
+        });
         
-        setSpecies(transformedSpecies);
+        const extraSpecies = additionalSpecies.map((species, index) => ({
+          ...species,
+          id: `static-${index}`,
+        }));
+
+        setSpecies([...transformedSpecies, ...extraSpecies]);
         setError(null);
       } catch (err) {
         console.error('Error fetching species:', err);
@@ -114,6 +174,29 @@ function App() {
       b.name || b.commonName || ''
     );
   });
+
+  const handleSearchChange = (event) => {
+    const inputValue = event.target.value;
+
+    // Validar que el input sea válido:
+    // - no puede estar vacío (solo espacios)
+    // - no se permiten caracteres especiales prohibidos
+    if (inputValue !== '' && !isValidSearchInput(inputValue)) {
+      setSearchError(
+        '❌ No se permiten caracteres especiales. Solo letras, números, espacios, guiones y apóstrofes.'
+      );
+      return;
+    }
+
+    // Validar búsquedas vacías (solo espacios en blanco)
+    if (inputValue.trim() === '' && inputValue !== '') {
+      setSearchError('❌ La búsqueda no puede estar vacía.');
+      return;
+    }
+
+    setFilterName(inputValue);
+    setSearchError(''); // Limpiar error si el input es válido
+  };
 
   const handleSaveSpecies = (speciesToSave) => {
     setSavedSpecies((current) => {
@@ -181,16 +264,28 @@ function App() {
           
           {!loading && !error && (
             <>
-              <section>
-                <label htmlFor="species-filter">Filtrar por nombre:</label>
+              <section className="search-section">
+                <label htmlFor="species-filter">🔍 Filtrar por nombre:</label>
                 <input
                   id="species-filter"
                   type="text"
                   value={filterName}
-                  onChange={(event) => setFilterName(event.target.value)}
-                  placeholder="Ej. Tonina"
+                  onChange={handleSearchChange}
+                  placeholder="Ej. Tonina, Centolla..."
+                  aria-describedby="search-error"
                 />
+                {searchError && (
+                  <p id="search-error" className="search-error-message">
+                    {searchError}
+                  </p>
+                )}
               </section>
+
+              {sortedSpecies.length === 0 && filterName.trim() !== '' && (
+                <section className="no-results-message">
+                  <p>No se encontraron especies con ese nombre</p>
+                </section>
+              )}
 
               <div className="ticks"></div>
 
