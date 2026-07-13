@@ -3,9 +3,26 @@ import reactLogo from './assets/react.svg'
 import viteLogo from './assets/vite.svg'
 import heroImg from './assets/hero.png'
 import './App.css'
+import { getSavedSpecies, saveSpecies, removeSpecies } from './services/storageService'
 
 function App() {
   const [count, setCount] = useState(0)
+  const [savedSpecies, setSavedSpecies] = useState(() => getSavedSpecies())
+
+  const handleAddSpecies = () => {
+    const nextSpecies = saveSpecies({
+      id: Date.now().toString(),
+      name: `Especie ${savedSpecies.length + 1}`,
+      scientificName: 'Desconocida',
+    })
+
+    setSavedSpecies(nextSpecies)
+  }
+
+  const handleRemoveSpecies = (id) => {
+    const nextSpecies = removeSpecies(id)
+    setSavedSpecies(nextSpecies)
+  }
 
   return (
     <>
@@ -28,6 +45,31 @@ function App() {
         >
           Count is {count}
         </button>
+      </section>
+
+      <div className="ticks"></div>
+
+      <section id="saved-species">
+        <div>
+          <h2>Especies guardadas</h2>
+          <button type="button" onClick={handleAddSpecies}>
+            Agregar especie de ejemplo
+          </button>
+          {savedSpecies.length === 0 ? (
+            <p>No hay especies guardadas.</p>
+          ) : (
+            <ul>
+              {savedSpecies.map((species) => (
+                <li key={species.id}>
+                  <strong>{species.name}</strong> ({species.scientificName})
+                  <button type="button" onClick={() => handleRemoveSpecies(species.id)}>
+                    Eliminar
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </section>
 
       <div className="ticks"></div>
