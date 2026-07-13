@@ -1,4 +1,4 @@
-import PropTypes from 'prop-types';
+import './SpeciesCard.css';
 
 function SpeciesCard({
   name,
@@ -21,7 +21,7 @@ function SpeciesCard({
 
   return (
     <article className={`species-card ${isSaved ? 'species-card--saved' : ''}`}>
-      <img className="species-card__image" src={imageUrl} alt={name} />
+      <img className="species-card__image" src={`/${imageUrl}`} alt={name} />
       <h3>{name}</h3>
       {isSaved && <div className="species-card__seen">✅ Especie vista</div>}
       <p>
@@ -64,18 +64,5 @@ function SpeciesCard({
     </article>
   );
 }
-
-SpeciesCard.propTypes = {
-  name: PropTypes.string.isRequired,
-  scientificName: PropTypes.string.isRequired,
-  depth: PropTypes.string.isRequired,
-  conservationStatus: PropTypes.string,
-  habitat: PropTypes.string,
-  diet: PropTypes.string,
-  imageUrl: PropTypes.string.isRequired,
-  onSave: PropTypes.func,
-  onRemove: PropTypes.func,
-  isSaved: PropTypes.bool,
-};
 
 export default SpeciesCard;
