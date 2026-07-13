@@ -83,7 +83,7 @@ const initialSpecies = [
     imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/4/45/Mytilus_chilensis.jpg',
   },
 ];
-import { getSavedSpecies, saveSpecies, removeSpecies } from './services/storageService'
+
 
 function App() {
   const [species] = useState(initialSpecies);
@@ -144,21 +144,15 @@ function App() {
   const handleRemoveSpecies = (id) => {
     setSavedSpecies((current) => current.filter((s) => s.id !== id));
   };
-  const [savedSpecies, setSavedSpecies] = useState(() => getSavedSpecies())
 
   const handleAddSpecies = () => {
-    const nextSpecies = saveSpecies({
+    const newSpecies = {
       id: Date.now().toString(),
       name: `Especie ${savedSpecies.length + 1}`,
       scientificName: 'Desconocida',
-    })
+    };
 
-    setSavedSpecies(nextSpecies)
-  }
-
-  const handleRemoveSpecies = (id) => {
-    const nextSpecies = removeSpecies(id)
-    setSavedSpecies(nextSpecies)
+    setSavedSpecies((current) => [...current, newSpecies]);
   }
 
   return (
